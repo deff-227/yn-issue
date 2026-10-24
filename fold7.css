@@ -100,3 +100,29 @@ body{background:#24342f;color:#edf1e9}
 #modal-layer[hidden]{display:none!important}
 @media(max-width:1000px){.scene{padding:20px 14px 42px;min-height:100dvh}.intro,.right-note{display:none}.device-wrap{width:100%}.device{height:min(805px,calc(100dvh - 82px))}.under-device{margin-top:12px}}
 @media(max-width:550px){body{background:#24342f}.scene{padding:0;display:block;min-height:100dvh}.device-wrap{width:100%;display:block}.device{width:100%;height:100dvh;min-height:540px;max-width:100%;padding:0;border:0;border-radius:0;box-shadow:none}.device>.screen{border-radius:0}.device.folded-open{width:100%;height:100dvh}.under-device{display:none}.issue-surface{inset:33px 0 42px}.home .app-grid{gap:14px 10px}}
+
+/* Matching the supplied multi-page Yeopne launcher */
+.home .home-carousel{display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;flex:1;min-height:0;scrollbar-width:none;touch-action:pan-x pan-y;margin:0 -2px}
+.home .home-carousel::-webkit-scrollbar{display:none}
+.home .home-page{flex:0 0 100%;width:100%;min-width:0;scroll-snap-align:start;padding:0 2px}
+.home .home-page>.home-apps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px 10px;align-content:start;margin-top:20px}
+.home .home-page>h3{font-size:18px;color:#fff;margin:25px 3px 28px;font-weight:500}
+.home .dots{display:flex;justify-content:center;align-items:center;gap:11px;padding:10px 0 12px;flex:none}
+.home .dots button{padding:0;font-size:7px;opacity:.35;color:#fff}
+.home .dots button.active{opacity:1}
+.home .drawer-button{flex:none;color:#fff;padding:5px;font-size:16px}
+.home-note-widget{display:block;width:100%;padding:19px 20px;background:#f7f5edeb;color:#3b4138;text-align:left;border-radius:24px;margin:25px 0}
+.home-note-widget small{display:block;font-size:10px;color:#777;margin-bottom:8px}
+.home-note-widget b{display:block;font-size:16px}
+.home-note-widget p{font-size:12px;line-height:1.8;margin:9px 0 0}
+.home-note-widget>img{width:100%;height:145px;object-fit:cover;border-radius:14px;margin-bottom:13px}
+.drawer-native{min-height:100%;padding:19px 13px 34px;background:#14251f;color:#fff}
+.drawer-native .drawer-title{font-size:15px;text-align:center;margin:20px auto 28px}
+.drawer-native .home-apps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:26px 8px}
+.drawer-native .app-icon-button{display:flex;flex-direction:column;align-items:center;gap:7px;min-width:0}
+.drawer-native .app-icon-button .app-icon{width:50px;height:50px;border-radius:16px;overflow:hidden;display:grid;place-items:center}
+.drawer-native .app-icon img{height:100%;width:100%;object-fit:cover}
+.drawer-native .app-icon-button small{font-size:10px;color:#fff;white-space:nowrap}
+.drawer-native .drawer-dismiss{margin:38px auto 0;display:block;padding:11px 18px;border-radius:18px;background:#f0f6ee;color:#284135;font-size:12px}
+.issue-surface:has(.drawer-native){background:#14251f}
+@media(max-width:550px){.home .home-page>.home-apps{gap:15px 10px}.home .home-carousel{min-height:0}}
