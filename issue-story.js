@@ -190,7 +190,13 @@ ARTICLES.forEach(a=>{const times={kiss:"00:06",hands:"00:19",ring:"00:14",follow
  renderLock=function(...args){const x=lockOriginal(...args);const el=document.querySelector("#surface .lock-screen");if(!el)return x;
   const t=el.querySelector(".lock-time");if(t)t.innerHTML="<span>00</span><span>"+String(flow.minute).padStart(2,"0")+"</span>";
   const d=el.querySelector(".lock-date");if(d)d.textContent="10월 26일 월요일";
-  const c=el.querySelector(".lock-notification");if(c){c.setAttribute("onclick","beginUnlock('messages')");c.querySelector(".notice-name").textContent="010-9***-3***";c.querySelector(".notice-message").textContent="어젯밤 주차장에서 찍은 사진입니다. [사진 3장]";const badge=c.querySelector(".notice-top");if(badge)badge.innerHTML='<span><span class="kakao-mini" style="background:#dfefff;color:#3c627e">SMS</span> 메시지</span><span>지금</span>';c.style.display=flow.muted||flow.cleared.includes("seq2-0")?"none":""}
+  let c=el.querySelector(".issue-lock-preview")||el.querySelector(".lock-notification");
+  if(!c){
+   c=document.createElement("button");c.type="button";c.className="lock-notification issue-lock-preview";
+   c.innerHTML='<div class="notice-top"><span><span class="kakao-mini">SMS</span> 메시지</span><span>지금</span></div><div class="notice-name"></div><div class="notice-message"></div>';
+   el.appendChild(c);
+  }
+  if(c){c.classList.add("issue-lock-preview");c.setAttribute("onclick","beginUnlock('messages')");c.querySelector(".notice-name").textContent="010-9***-3***";c.querySelector(".notice-message").textContent="어젯밤 주차장에서 찍은 사진입니다. [사진 3장]";const badge=c.querySelector(".notice-top");if(badge)badge.innerHTML='<span><span class="kakao-mini" style="background:#dfefff;color:#3c627e">SMS</span> 메시지</span><span>지금</span>';c.style.display=flow.muted||flow.cleared.includes("seq2-0")?"none":""}
   return x;
  };
  if(typeof queueIncomingCall==="function")queueIncomingCall=function(){};
