@@ -186,7 +186,22 @@ ARTICLES.forEach(a=>{const times={kiss:"00:06",hands:"00:19",ring:"00:14",follow
   el.querySelectorAll(".schedule-widget").forEach(x=>{x.setAttribute("onclick","openApp('after-news')");x.innerHTML="온라인 속보<b>최상엽·신예찬 열애설</b><span style='font-size:9px'>관련 기사 확인</span>"});
   const txt=el.querySelector(".weather-widget small:last-child");if(txt)txt.textContent="10.26 오전 "+clock();
  }
- const lockOriginal=renderLock;
+ const originalPhoneClock=updatePhoneClock;
+updatePhoneClock=function(...args){
+ const ret=originalPhoneClock(...args);
+ const status=document.querySelector("#statusbar>span:first-child");
+ if(status)status.innerHTML=clock()+` <span class="tiny-notice">${shown().length?"▣":""}</span>`;
+ const lock=document.querySelector("#surface .lock-time");
+ if(lock)lock.innerHTML="<span>00</span><span>"+String(flow.minute).padStart(2,"0")+"</span>";
+ const d=document.querySelector("#surface .lock-date");
+ if(d)d.textContent="10월 26일 월요일";
+ const under=document.querySelector(".under-device>span:last-child");
+ if(under)under.textContent=clock()+" AM";
+ const weather=document.querySelector("#surface .weather-widget small:last-child");
+ if(weather)weather.textContent="10.26 오전 "+clock();
+ return ret;
+};
+const lockOriginal=renderLock;
  renderLock=function(...args){const x=lockOriginal(...args);const el=document.querySelector("#surface .lock-screen");if(!el)return x;
   const t=el.querySelector(".lock-time");if(t)t.innerHTML="<span>00</span><span>"+String(flow.minute).padStart(2,"0")+"</span>";
   const d=el.querySelector(".lock-date");if(d)d.textContent="10월 26일 월요일";
