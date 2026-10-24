@@ -123,6 +123,7 @@ let state;
 try{state={...DEFAULT,...JSON.parse(localStorage.getItem(STORE)||'{}')}}catch(_){state={...DEFAULT}}
 const save=()=>{try{localStorage.setItem(STORE,JSON.stringify(state))}catch(_){}};
 const screen=document.getElementById('screen');
+let pinBuffer='';
 let page='lock',viewArgs={},history=[],photoIdx=0,appTab='feed',tweetExpand='',storyIndex=null,instaOpenComments={},scrollPositions={};
 const escaped=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const formatText=s=>escaped(s).replace(/\n/g,'<br>');
@@ -139,12 +140,34 @@ function availableNotices(){return state.notificationsMuted?[]:ALERTS.filter(n=>
 function updateStatus(){let remain=availableNotices().length;document.getElementById('unread-dot').style.display=remain?'inline-block':'none';document.getElementById('status-time').textContent=sceneTime()}
 function nav(to,args={},replace=false){if(page!==to||JSON.stringify(args)!==JSON.stringify(viewArgs)){if(!replace)history.push({page,args:viewArgs,scroll:screen.scrollTop});page=to;viewArgs=args;render()}}
 function back(){if(page==='viewer'){page='gallery';render();return}if(history.length){const h=history.pop();page=h.page;viewArgs=h.args||{};render();screen.scrollTop=h.scroll||0;return}if(page!=='home'){page='home';viewArgs={};render()}}
-function render(){updateStatus();const html=({lock:lockPage,home:homePage,notifications:notificationsPage,kakao:kakaoPage,thread:threadPage,x:xPage,instagram:instagramPage,news:newsPage,article:articlePage,messages:messagesPage,mail:mailPage,maildetail:mailDetailPage,smsthread:smsThreadPage,gallery:galleryPage,viewer:viewerPage,phone:phonePage,notes:notesPage,music:musicPage,settings:settingsPage,browser:browserPage,calendar:calendarPage,bubble:bubblePage,recent:recentPage})[page]();screen.innerHTML=html;screen.scrollTop=0;wireSpecific();}
+function render(){updateStatus();const html=({lock:lockPage,pin:pinPage,home:homePage,notifications:notificationsPage,kakao:kakaoPage,thread:threadPage,x:xPage,instagram:instagramPage,news:newsPage,article:articlePage,messages:messagesPage,mail:mailPage,maildetail:mailDetailPage,smsthread:smsThreadPage,gallery:galleryPage,viewer:viewerPage,phone:phonePage,notes:notesPage,music:musicPage,settings:settingsPage,browser:browserPage,calendar:calendarPage,bubble:bubblePage,recent:recentPage})[page]();screen.innerHTML=html;screen.scrollTop=0;wireSpecific();}
 const header=(title,sub='',actions='')=>`<div class="app-header"><button class="header-btn" data-back aria-label="뒤로">‹</button><div><h2>${title}</h2>${sub?`<p class="subheader">${sub}</p>`:''}</div><span class="header-spacer"></span>${actions}</div>`;
-function lockPage(){const first=ALERTS.filter(n=>arrived(n.at)).slice(-3).reverse();return `<div class="lock"><div class="lock-top"><div class="lock-date">10월 26일 월요일</div><div class="lock-clock">${sceneTime()}</div><div class="lock-sub">공연이 끝난 지 두 시간쯤 지났을 때</div>${first.map(n=>`<button class="lock-preview" data-unlock><span class="lock-source">${n.icon}</span><span class="preview-copy"><b>${escaped(n.title)}</b><small>${escaped(n.message)}</small></span><span>›</span></button>`).join('')}</div><div class="lock-bottom"><button data-unlock>위로 밀어 잠금 해제 ↑</button><div class="lock-hint">화면을 눌러 잠금 해제</div></div></div>`}
+function lockPage(){
+ const clock=sceneTime().split(':');
+ const first=ALERTS.filter(n=>arrived(n.at)).slice(-2).reverse();
+ return `<div class="lock-screen">
+  <div class="lock-icon">♧</div><div class="lock-time"><span>${clock[0]}</span><span>${clock[1]}</span></div>
+  <div class="lock-date">10월 26일 월요일</div>
+  ${first.map(n=>`<button type="button" class="lock-notification" data-unlock aria-label="${escaped(n.title)}의 알림 확인"><div class="notice-top"><span><span class="kakao-mini">${n.from==='카카오톡'?'TALK':escaped(n.from)}</span> ${escaped(n.from)}</span><span>지금</span></div><div class="notice-name">${escaped(n.title)}</div><div class="notice-message">${escaped(n.message)}</div></button>`).join('')}
+  <div class="lock-bottom"><button type="button" data-unlock>화면을 밀어 잠금 해제 ↑</button></div>
+ </div>`;
+}
 
-function homePage(){const apps=[['kakao','카카오톡'],['messages','메시지'],['news','뉴스'],['mail','Gmail'],['x','X'],['instagram','Instagram'],['gallery','갤러리'],['browser','인터넷'],['notes','메모'],['calendar','캘린더'],['music','뮤직'],['settings','설정']];return `<div class="home"><div class="home-header"><div><h1>10월 26일 월요일</h1><p class="home-weather">공연이 끝난 다음 날 · 새벽</p></div><button class="header-btn" data-open="notifications" aria-label="알림 열기">☷ ${availableNotices().length?`<span class="count">${availableNotices().length}</span>`:''}</button></div><div class="home-clock">${sceneTime()}</div><p class="home-tagline">아직 잠들지 않은 휴대폰</p><button class="home-feature" data-open="${state.minute>=2?'news':'messages'}"><div><span class="feature-eyebrow">${state.minute>=2?'NEWS · BREAKING':'MESSAGE · 010-9***-3***'}</span><strong>${state.minute>=2?'최상엽·신예찬,<br>차량 안 입맞춤 보도':'사진 3장.<br>기사 나가기 전에 답 주세요.'}</strong></div><span class="feature-chevron">↗</span></button><div class="app-grid">${apps.map(a=>iconApp(...a)).join('')}</div><div class="dock">${[['phone','전화'],['kakao','카카오톡'],['messages','메시지'],['gallery','갤러리']].map(a=>iconApp(...a)).join('')}</div></div>`}
+function homePage(){
+ const apps=[['kakao','카카오톡'],['messages','메시지'],['news','뉴스'],['mail','Gmail'],['x','X'],['instagram','Instagram'],['gallery','갤러리'],['browser','인터넷'],['notes','메모'],['calendar','캘린더'],['music','뮤직'],['settings','설정']];
+ return `<div class="home"><div class="home-top">
+ <button class="weather-widget" data-open="calendar"><span class="weather-moon">☾</span><div class="degree">13°</div><small>서울특별시<br>맑음 · 최저 11° / 최고 20°</small><small style="margin-top:5px">10.26 오전 ${sceneTime()}</small></button>
+ <div class="mini-widgets"><button class="date-widget" data-open="calendar">10월 26일 월요일<b>공연 다음 날</b></button><button class="schedule-widget" data-open="news">방금 도착한 속보<b>열애설 기사 확산</b><span style="font-size:9px;opacity:.75">AFTER THE ENCORE</span></button></div></div>
+ <button class="search-widget" data-open="browser"><span class="google-g">G</span><span style="flex:1;text-align:left;opacity:.62;font-size:12px">검색어 또는 URL 입력</span><span>⌕</span><span>♫</span></button>
+ <div class="app-grid">${apps.map(a=>iconApp(...a)).join('')}</div>
+ <div class="dock">${[['phone','전화'],['kakao','카카오톡'],['messages','메시지'],['browser','인터넷']].map(a=>iconApp(...a)).join('')}</div></div>`;
+}
 
+function pinPage(){
+ const dots=[0,1,2,3].map(i=>`<span class="pin-dot ${i<pinBuffer.length?'filled':''}"></span>`).join('');
+ const keys=[1,2,3,4,5,6,7,8,9,'',0,'⌫'].map((v,i)=>v===''?'<span></span>':`<button type="button" data-pin-key="${v}" aria-label="${v==='⌫'?'한 자리 지우기':v}">${v}<small>${['','ABC','DEF','GHI','JKL','MNO','PQRS','TUV','WXYZ'][i]||' '}</small></button>`).join('');
+ return `<div class="pin-screen"><h2>PIN 입력</h2><div class="pin-hint" id="pin-message">휴대전화의 잠금을 해제하려면 PIN을 입력하세요.</div><div class="pin-dots">${dots}</div><div class="keypad">${keys}</div><div class="lock-tip">힌트 · 0613</div></div>`;
+}
 function notificationsPage(){const notes=availableNotices();return `<div class="notice-sheet"><div class="notice-heading"><div><p>10월 26일 월요일</p><h2>${sceneTime()}</h2></div><button class="header-btn" data-back aria-label="닫기">✕</button></div><div class="quickbar"><button class="quick-tile on" data-quick="wifi"><strong>◉ Wi-Fi</strong>연결됨</button><button class="quick-tile on" data-quick="sound"><strong>♫ 소리</strong>벨소리</button><button class="quick-tile" data-quick="flight"><strong>✈ 비행기</strong>꺼짐</button></div><div class="brightness"><span></span></div><div class="noti-actions"><strong>알림 ${notes.length}개</strong><button class="text-btn" data-clear-notices>모두 지우기</button></div>${notes.length?notes.slice().reverse().map(n=>`<button class="notification" data-notice="${n.id}"><span class="notice-icon">${n.icon}</span><span class="notice-message"><b>${escaped(n.title)}</b><small>${escaped(n.message)}</small></span><time>00:${String(n.at).padStart(2,'0')}</time></button>`).join(''):'<div class="empty">알림이 없다.<br>대화·문자·메일은 그대로 남아 있다.</div>'}<div class="silent-row"><span>전체 알림</span><button data-mute-notices>${state.notificationsMuted?'다시 켜기':'알림 끄기'}</button></div></div>`}
 
 function kakaoPage(){return `<div class="app-page">${header('카카오톡','채팅',`<button class="header-btn" data-open="notifications">♧</button>`)}<div class="tabs"><button class="active">채팅</button><button data-open="kakao">친구</button></div>${Object.entries(CHAT_ROOMS).map(([id,ch])=>{const msgs=getRoomMessages(id);const last=(state.sent[id]||[]).at(-1);let line=last?.text||msgs.at(-1)?.text||'새 메시지 없음';const badge=state.readRooms.includes(id)?'':'<span class="count">1</span>';return `<button class="chat-row" data-room="${id}"><span class="avatar" style="background:${ch.color}">${ch.avatar?`<img src="${PHOTO(ch.avatar)}" alt="">`:(ch.initial||'●')}</span><span class="chat-summary"><strong>${escaped(ch.name)}</strong><p>${escaped(line)}</p></span><span class="chat-meta"><span>${last?sceneTime():msgs.at(-1)?.time||'어제'}</span>${badge}</span></button>`}).join('')}</div>`}
@@ -202,7 +225,8 @@ function modal(title,body,confirm){const layer=document.getElementById('modal-la
 function wireSpecific(){if(page==='thread'){const box=document.querySelector('.thread-scroll');if(box)box.scrollTop=box.scrollHeight}}
 function handleClick(e){const el=e.target.closest('button,a');if(!el||el.tagName==='A')return;
  const ds=el.dataset;
- if('unlock' in ds){state.unlocked=true;save();nav('home');return}
+ if('unlock' in ds){pinBuffer='';nav('pin');return}
+ if('pinKey' in ds){if(ds.pinKey==='⌫')pinBuffer=pinBuffer.slice(0,-1);else if(pinBuffer.length<4)pinBuffer+=ds.pinKey;if(pinBuffer.length===4){if(pinBuffer==='0613'){state.unlocked=true;save();pinBuffer='';nav('home',{},true);return}pinBuffer='';render();const msg=document.getElementById('pin-message');if(msg)msg.textContent='PIN이 올바르지 않습니다.';return}render();return}
  if('back' in ds){back();return}
  if('open' in ds){if(ds.open==='news'&&state.minute<2)forward(2);if(ds.open==='x'&&state.minute<4)forward(4);nav(ds.open);return}
  if('article' in ds){nav('article',{id:ds.article});return}
@@ -238,10 +262,13 @@ function handleSubmit(e){const form=e.target.closest('form');if(!form)return;e.p
  const iid=form.dataset.igReply;if(iid){const inp=form.querySelector('input'),txt=inp.value.trim();if(!txt)return;state.instaReplies[iid]=[...(state.instaReplies[iid]||[]),txt];save();let scroll=screen.scrollTop;render();screen.scrollTop=scroll;return}}
 screen.addEventListener('click',handleClick);screen.addEventListener('submit',handleSubmit);
 document.getElementById('status-toggle').onclick=()=>nav('notifications');
-document.getElementById('home-btn').onclick=()=>{page='home';history=[];render()};
+document.getElementById('home-btn').onclick=()=>{if(!state.unlocked){pinBuffer='';nav('pin');return}page='home';history=[];render()};
 document.getElementById('back-btn').onclick=back;
 document.getElementById('recent-btn').onclick=()=>nav('recent');
-let startY=0;screen.addEventListener('touchstart',e=>{startY=e.touches[0].clientY},{passive:true});screen.addEventListener('touchend',e=>{if(page!=='notifications'&&page!=='viewer'&&startY<180&&e.changedTouches[0].clientY-startY>85){nav('notifications')}else if(page==='lock'&&startY-e.changedTouches[0].clientY>65){state.unlocked=true;save();nav('home')}else if(page==='viewer'){const diff=e.changedTouches[0].clientX-(window.__swipeX||0);if(Math.abs(diff)>60){photoIdx=(photoIdx+(diff<0?1:PHOTOS.length-1))%PHOTOS.length;render()}}},{passive:true});screen.addEventListener('touchstart',e=>{window.__swipeX=e.touches[0].clientX},{passive:true});
+let startY=0;screen.addEventListener('touchstart',e=>{startY=e.touches[0].clientY},{passive:true});screen.addEventListener('touchend',e=>{if(page!=='notifications'&&page!=='viewer'&&startY<180&&e.changedTouches[0].clientY-startY>85){nav('notifications')}else if(page==='lock'&&startY-e.changedTouches[0].clientY>65){pinBuffer='';nav('pin')}else if(page==='viewer'){const diff=e.changedTouches[0].clientX-(window.__swipeX||0);if(Math.abs(diff)>60){photoIdx=(photoIdx+(diff<0?1:PHOTOS.length-1))%PHOTOS.length;render()}}},{passive:true});screen.addEventListener('touchstart',e=>{window.__swipeX=e.touches[0].clientX},{passive:true});
+document.getElementById('foldBtn').onclick=()=>{const dev=document.getElementById('device');dev.classList.toggle('folded-open');document.getElementById('foldBtn').innerHTML=dev.classList.contains('folded-open')?'<span>▯</span> 접어 보기':'<span>▣</span> 펼쳐 보기';};
+for(const id of ['power-display','power-side'])document.getElementById(id).onclick=()=>{state.unlocked=false;save();pinBuffer='';history=[];nav('lock',{},true)};
+document.addEventListener('keydown',e=>{if(page!=='pin')return;if(/^\d$/.test(e.key)||e.key==='Backspace'){const key=e.key==='Backspace'?'⌫':e.key;const b=screen.querySelector('[data-pin-key="'+key+'"]');b?.click();}});
 page=state.unlocked?'home':'lock';render();
 let pulse=0;setInterval(()=>{if(document.hidden||document.activeElement?.matches?.('input,textarea'))return;pulse++;if(pulse%3===0)forward(1)},1000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){pulse=0;render()}});
