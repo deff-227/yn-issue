@@ -1,0 +1,37 @@
+/* AFTER THE ENCORE: only story additions. The original Yeopne UI/CSS is unchanged. */
+.app-icon.after-news{background:#fff;color:#05ab53}.app-icon.after-x{background:#141414;color:#fff}.app-icon.after-ig{background:linear-gradient(135deg,#ffd15e,#f35386,#8355ce);color:#fff}
+.issue-alerts{margin:12px 0 15px;background:#fff5;border-radius:18px;padding:11px}
+.issue-alert-controls{display:flex;gap:7px;align-items:center;margin-bottom:10px;font-size:10px;color:#244139}
+.issue-alert-controls b{margin-right:auto}.issue-alert-controls button{font-size:10px;padding:7px;border-radius:10px;background:#f2f8f0;color:#294236}
+.issue-alert-scroll{max-height:240px;overflow-y:auto;overscroll-behavior:contain}.issue-alert-scroll>button{width:100%;text-align:left;display:flex;flex-direction:column;gap:4px;background:#eff3ebd9;color:#213d33;padding:10px 12px;border-radius:13px;margin:6px 0}
+.issue-alert-scroll small{font-size:9px;color:#597064}.issue-alert-scroll b{font-size:11px}.issue-alert-scroll span{font-size:11px;line-height:1.5}.issue-alert-scroll p{font-size:11px;padding:12px;text-align:center}
+.issue-brand{display:flex;align-items:center;justify-content:space-between;color:#09ae53;font-size:31px;font-weight:800;padding:14px 18px;background:white}
+.issue-brand strong{color:#242b26;margin-left:5px;margin-right:auto;font-size:20px}.issue-brand small{font-size:11px;color:#536157;font-weight:400}
+.issue-brand.issue-dark{background:#101010;color:#fff;justify-content:center}
+.issue-hot{font-size:11px;background:#e9f2e9;color:#284b33;padding:12px 16px}
+.issue-article{display:flex;flex-direction:column;gap:10px;background:#fff;color:#151c19;text-align:left;width:100%;border-bottom:1px solid #eaeaea;padding:17px 18px}
+.issue-article small{font-size:10px;color:#89958b}.issue-article b{font-size:15px;line-height:1.55;font-weight:700;word-break:keep-all}.issue-article p{font-size:12px;color:#617165;line-height:1.7}
+.issue-post{border-bottom:1px solid #2e3540;background:#13161d;color:#fff;padding:17px 15px;text-align:left}.issue-post>b{font-size:13px}.issue-post>small{font-size:10px;color:#a0a4af}.issue-post p{font-size:12px;line-height:1.85;margin:9px 0;color:#eee;white-space:pre-wrap;word-break:keep-all}
+.issue-link{display:block;margin:8px 0;padding:12px;border-radius:10px;background:#242a36;color:#b9d2e4;font-size:11px;text-align:left;width:100%}
+.issue-post-actions{display:flex;align-items:center;gap:18px;margin-top:12px;color:#a3afbc;font-size:11px}.issue-post-actions button{font-size:11px;color:#bbc6cc}
+.issue-comment{display:block;margin-top:9px;color:#a3aeb4;font-size:10px;line-height:1.7}
+.issue-insta{background:#fff;color:#181818;padding-bottom:16px;border-bottom:10px solid #fafafa}.issue-insta-user{display:flex;align-items:center;gap:9px;padding:11px 15px;font-size:12px}
+.issue-insta-user img{width:30px;height:30px;border-radius:50%;object-fit:cover}.issue-insta-photo{width:100%;aspect-ratio:1;object-fit:cover}
+.issue-insta .issue-post-actions,.issue-insta>p,.issue-insta .issue-comment{padding:0 13px}.issue-insta>p{font-size:12px;line-height:1.7;margin-top:13px}
+.issue-insta .issue-post-actions{color:#161616}.issue-insta .issue-post-actions button{font-size:16px;color:#131313}.issue-insta .issue-comment{color:#757575}
+.issue-sites{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:17px 15px}
+.issue-sites button{display:flex;flex-direction:column;gap:9px;align-items:center;font-size:11px;color:#333;white-space:nowrap}
+.issue-sites b{display:grid;place-items:center;width:45px;height:45px;background:#1bad63;color:white;font-size:26px;border-radius:15px}
+.issue-sites button:nth-child(2) b{background:#0e0e0e}.issue-sites button:nth-child(3) b{background:linear-gradient(135deg,#ffc86d,#ea3e88,#8153c9)}
+.issue-detail{background:white;color:#1d1d1d;padding:22px 19px;min-height:100%;font-size:12px;line-height:1.9}
+.issue-detail h2{font-size:20px;line-height:1.6;margin:13px 0 17px}.issue-detail p{margin:14px 0}.issue-detail small{font-size:10px;color:#748077}
+.issue-detail>button{background:#edf5eb;color:#244c34;padding:11px 15px;border-radius:13px;margin:15px 0}
+.issue-proof{display:grid;grid-template-columns:repeat(3,1fr);height:130px;gap:5px;margin:19px 0;background:#202a2c;padding:7px;border-radius:12px}
+.issue-proof b{display:grid;place-items:center;background:linear-gradient(130deg,#283838,#56625d,#1e2b2d);color:#bac7c1;font-size:9px;border-radius:7px}
+.issue-sms-row .chat-details{min-width:0}.issue-sms-row .chat-details p{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.issue-home-alert{display:none}
+/* Prevent inherited dark custom-site CSS from overriding native Samsung apps. */
+#surface .app-view{box-sizing:border-box}
+#overlay .issue-alerts *{box-sizing:border-box}
+.quick-panel:has(.issue-alerts){overflow-y:auto;scrollbar-width:none}
+.quick-panel:has(.issue-alerts) .quick-bottom{margin-top:9px}
