@@ -35,3 +35,16 @@
 #overlay .issue-alerts *{box-sizing:border-box}
 .quick-panel:has(.issue-alerts){overflow-y:auto;scrollbar-width:none}
 .quick-panel:has(.issue-alerts) .quick-bottom{margin-top:9px}
+
+/* Event notifications inside the original Galaxy screen */
+#screen>.issue-push-banner{position:absolute;top:36px;left:12px;right:12px;z-index:120;display:flex;flex-direction:column;gap:4px;padding:13px 15px;border-radius:18px;background:rgba(247,250,243,.96);border:1px solid #ffffffb8;box-shadow:0 13px 35px #101c1950;color:#223b32;text-align:left;backdrop-filter:blur(20px);animation:issueSlideDown .28s ease-out;max-width:calc(100% - 24px)}
+#screen>.issue-push-banner small{font-size:10px;color:#587063;line-height:1.4}
+#screen>.issue-push-banner b{font-size:12px;font-weight:700}
+#screen>.issue-push-banner span{font-size:12px;line-height:1.55;word-break:keep-all}
+@keyframes issueSlideDown{from{transform:translateY(-12px);opacity:0}to{transform:translateY(0);opacity:1}}
+.issue-proof button{display:grid;place-items:center;border-radius:7px;background:linear-gradient(140deg,#364746,#697870,#202f31);color:#dae6df;font-size:10px;padding:8px}
+.issue-proof button:focus-visible{outline:2px solid #c2e5d1;outline-offset:2px}
+.issue-sms-footer{text-align:center;font-size:10px;color:#758797;background:#f1f3f5;padding:12px}
+.issue-alert-scroll>button:focus-visible{outline:2px solid #1d6147;outline-offset:2px}
+.issue-sms-row .chat-details{overflow:hidden}
+.issue-sms-row .chat-details p{max-width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
