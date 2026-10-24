@@ -215,6 +215,25 @@ ARTICLES.forEach(a=>{const times={kiss:"00:06",hands:"00:19",ring:"00:14",follow
   p.innerHTML=`<div class="issue-alert-controls"><b>새 알림 ${shown().length}개</b><button data-issue="mute">${flow.muted?"알림 켜기":"알림 끄기"}</button><button data-issue="clear">모두 지우기</button></div><div class="issue-alert-scroll">${shown().slice().reverse().map(n=>`<button data-issue="notice" data-id="${n.id}"><small>${escaped(n.from)} · 00:${String(n.at).padStart(2,"0")}</small><b>${escaped(n.title)}</b><span>${escaped(n.message)}</span></button>`).join("")||"<p>새 알림이 없습니다.</p>"}</div>`;
   root.querySelector(".quick-bottom")?.before(p);
  };
+ 
+ const replaySequel=function replaySequel(){
+ if(!confirm("10월 26일 00:00부터 다시 시작할까요?"))return;
+ flow.minute=0;flow.muted=false;flow.cleared=[];save();
+ for(const id of Object.values(mapping))if(Array.isArray(chats[id]))chats[id]=chats[id].filter(m=>!String(m[5]||"").startsWith("issue26:"));
+ saveStore("chats",chats);
+ unlocked=false;lockPhone();
+};
+ const previousSettings=renderSettings;
+ renderSettings=function(...args){
+   const result=previousSettings(...args);
+   const host=document.querySelector("#surface .app-content");
+   if(host&&!host.querySelector(".issue-settings-row")){
+     const row=document.createElement("div");row.className="section-card issue-settings-row";
+     row.innerHTML='<button class="list-item" type="button" data-issue="replay"><span>10월 26일 · 처음부터 다시 보기</span><span>↻</span></button>';
+     host.prepend(row);
+   }
+   return result;
+ };
  const smsOriginal=renderSMS;renderSMS=function(){const list=SMS_THREADS.filter(t=>t.at<=flow.minute);shell("메시지",`<div class="sms-hero">메시지 <span>${list.length}개의 대화</span></div>${list.map(t=>`<button class="chat-list-row" data-issue="sms" data-id="${t.id}"><span class="profile">${escaped(t.sender.slice(0,2))}</span><span class="chat-details"><b>${escaped(t.sender)}</b><p>${escaped(t.body.at(-1)[1])}</p></span><small>${clock()}</small></button>`).join("")}`)};
  const mailOriginal=renderMail;renderMail=function(){const list=MAILS.filter(t=>t.at<=flow.minute);shell("Gmail",`<div class="section-label">기본　받은편지함 · ${list.length}개</div>${list.slice().reverse().map(t=>`<button class="chat-list-row" data-issue="mail" data-id="${t.id}"><span class="profile">${escaped(t.from[0])}</span><span class="chat-details"><b>${escaped(t.from)}</b><p>${escaped(t.title)}</p></span><small>00:${String(t.at).padStart(2,"0")}</small></button>`).join("")}`)};
  renderInternet=function(){shell("인터넷",`<div class="section-label">즐겨찾기</div><div class="issue-sites"><button data-issue="app" data-id="after-news"><b>N</b> NAVER 뉴스</button><button data-issue="app" data-id="after-x"><b>𝕏</b> X</button><button data-issue="app" data-id="after-ig"><b>◎</b> Instagram</button></div><div class="section-label">최근 검색</div><button class="list-item" data-issue="app" data-id="after-news">최상엽 신예찬 열애설　›</button>`)};
@@ -269,6 +288,7 @@ document.getElementById("surface").addEventListener("click",e=>{
   else if(t==="article")showArticle(id);
   else if(t==="sms")showSMS(id);
   else if(t==="proof")showInfo("첨부된 사진", "주차장에서 촬영된 것으로 주장하는 사진 3장이 전송됐습니다. 현재 미리보기만 표시됩니다.");
+  else if(t==="replay")replaySequel();
   else if(t==="mail")showMail(id);
   else if(t==="smsback")renderSMS();
   else if(t==="mailback")renderMail();
