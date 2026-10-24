@@ -152,6 +152,10 @@ ARTICLES.forEach(a=>{const times={kiss:"00:06",hands:"00:19",ring:"00:14",follow
  const shown=()=>ALERTS.filter(n=>n.at<=flow.minute&&!flow.muted&&!flow.cleared.includes(n.id));
  const clock=()=>`00:${String(flow.minute).padStart(2,"0")}`;
  const mapping={company:"manager1",companypr:"company",yechan:"yechan",group:"group",wonsang:"wonsang",gwangil:"gwangil"};
+ if(flow.sequenceVersion!==SEQUENCE_VERSION){
+   for(const id of Object.values(mapping))if(Array.isArray(chats[id]))chats[id]=chats[id].filter(m=>!String(m[5]||"").startsWith("issue26:"));
+   saveStore("chats",chats);flow.minute=0;flow.cleared=[];flow.muted=false;flow.sequenceVersion=SEQUENCE_VERSION;save();
+ }
  CONTACTS.manager1.name="매니저 형";CONTACTS.manager1.short="매니저 형";
  CONTACTS.company.name="회사 홍보팀";CONTACTS.company.short="회사 홍보팀";
  CONTACTS.yechan.name="예찬이형♥";
@@ -186,10 +190,12 @@ ARTICLES.forEach(a=>{const times={kiss:"00:06",hands:"00:19",ring:"00:14",follow
  renderLock=function(...args){const x=lockOriginal(...args);const el=document.querySelector("#surface .lock-screen");if(!el)return x;
   const t=el.querySelector(".lock-time");if(t)t.innerHTML="<span>00</span><span>"+String(flow.minute).padStart(2,"0")+"</span>";
   const d=el.querySelector(".lock-date");if(d)d.textContent="10월 26일 월요일";
-  const c=el.querySelector(".lock-notification");if(c){c.setAttribute("onclick","beginUnlock('manager1')");c.querySelector(".notice-name").textContent="매니저 형";c.querySelector(".notice-message").textContent="상엽아 지금 폰 보지 말고 아무한테도 답장하지 마. 알았지";c.style.display=flow.muted||flow.cleared.includes("n0")?"none":""}
+  const c=el.querySelector(".lock-notification");if(c){c.setAttribute("onclick","beginUnlock('messages')");c.querySelector(".notice-name").textContent="010-9***-3***";c.querySelector(".notice-message").textContent="어젯밤 주차장에서 찍은 사진입니다. [사진 3장]";const badge=c.querySelector(".notice-top");if(badge)badge.innerHTML='<span><span class="kakao-mini" style="background:#dfefff;color:#3c627e">SMS</span> 메시지</span><span>지금</span>';c.style.display=flow.muted||flow.cleared.includes("seq2-0")?"none":""}
   return x;
  };
  if(typeof queueIncomingCall==="function")queueIncomingCall=function(){};
+ const pinKeyOriginal=pinKey;
+ pinKey=function(...args){const to=pending;const result=pinKeyOriginal(...args);if(unlocked&&to==="messages"){openApp("messages");showSMS("sms")}return result};
  if(typeof queueRefreshCallV29==="function")queueRefreshCallV29=function(){};
  const kakaoOriginal=renderKakao;renderKakao=function(...a){injectMessages();return kakaoOriginal(...a)};
  const chatOriginal=openChat;openChat=function(id){injectMessages();return chatOriginal(id)};
@@ -236,6 +242,6 @@ ARTICLES.forEach(a=>{const times={kiss:"00:06",hands:"00:19",ring:"00:14",follow
  injectMessages();lockPhone();
  const initialStatus=document.querySelector("#statusbar>span:first-child");
  if(initialStatus)initialStatus.innerHTML=clock()+" <span class='tiny-notice'>▣</span>";
- setInterval(()=>{if(flow.minute<26){flow.minute++;save();injectMessages();if(screen==="lock")renderLock();else if(screen==="kakao"&&!activeChat)renderKakao();else if(screen==="kakao"&&activeChat)renderChat()}const status=document.querySelector("#statusbar>span:first-child");if(status)status.innerHTML=clock()+" <span class='tiny-notice'>"+(shown().length?"▣":"")+"</span>"},11000);
+ setInterval(()=>{if(flow.minute<38){flow.minute++;save();injectMessages();if(screen==="lock")renderLock();else if(screen==="kakao"&&!activeChat)renderKakao();else if(screen==="kakao"&&activeChat)renderChat()}const status=document.querySelector("#statusbar>span:first-child");if(status)status.innerHTML=clock()+" <span class='tiny-notice'>"+(shown().length?"▣":"")+"</span>"},6500);
 })();
 })();
