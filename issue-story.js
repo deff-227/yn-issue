@@ -224,6 +224,8 @@ const MAILS=[
   if(t==="notice"){const n=ALERTS.find(a=>a.id===b.dataset.id);if(!n)return;flow.cleared.push(n.id);save();overlay.innerHTML="";if(mapping[n.target])openChat(mapping[n.target]);else if(n.target==="mail")openApp("mail");else if(n.target.startsWith("sms"))openApp("messages");else openApp("after-news")}
  });
  injectMessages();lockPhone();
+ const initialStatus=document.querySelector("#statusbar>span:first-child");
+ if(initialStatus)initialStatus.innerHTML=clock()+" <span class='tiny-notice'>▣</span>";
  setInterval(()=>{if(flow.minute<26){flow.minute++;save();injectMessages();if(screen==="lock")renderLock();else if(screen==="kakao"&&!activeChat)renderKakao();else if(screen==="kakao"&&activeChat)renderChat()}const status=document.querySelector("#statusbar>span:first-child");if(status)status.innerHTML=clock()+" <span class='tiny-notice'>"+(shown().length?"▣":"")+"</span>"},11000);
 })();
 })();
