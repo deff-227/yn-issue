@@ -124,6 +124,7 @@ try{state={...DEFAULT,...JSON.parse(localStorage.getItem(STORE)||'{}')}}catch(_)
 const save=()=>{try{localStorage.setItem(STORE,JSON.stringify(state))}catch(_){}};
 const screen=document.getElementById('screen');
 let pinBuffer='';
+let homeIndex=0;
 let page='lock',viewArgs={},history=[],photoIdx=0,appTab='feed',tweetExpand='',storyIndex=null,instaOpenComments={},scrollPositions={};
 const escaped=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const formatText=s=>escaped(s).replace(/\n/g,'<br>');
@@ -141,7 +142,7 @@ function availableNotices(){return state.notificationsMuted?[]:ALERTS.filter(n=>
 function updateStatus(){let remain=availableNotices().length;document.getElementById('unread-dot').style.display=remain?'inline-block':'none';document.getElementById('status-time').textContent=sceneTime()}
 function nav(to,args={},replace=false){if(page!==to||JSON.stringify(args)!==JSON.stringify(viewArgs)){if(!replace)history.push({page,args:viewArgs,scroll:screen.scrollTop});page=to;viewArgs=args;render()}}
 function back(){if(page==='viewer'){page='gallery';render();return}if(history.length){const h=history.pop();page=h.page;viewArgs=h.args||{};render();screen.scrollTop=h.scroll||0;return}if(page!=='home'){page='home';viewArgs={};render()}}
-function render(){updateStatus();const html=({lock:lockPage,pin:pinPage,home:homePage,notifications:notificationsPage,kakao:kakaoPage,thread:threadPage,x:xPage,instagram:instagramPage,news:newsPage,article:articlePage,messages:messagesPage,mail:mailPage,maildetail:mailDetailPage,smsthread:smsThreadPage,gallery:galleryPage,viewer:viewerPage,phone:phonePage,notes:notesPage,music:musicPage,settings:settingsPage,browser:browserPage,calendar:calendarPage,bubble:bubblePage,recent:recentPage})[page]();screen.innerHTML=html;screen.scrollTop=0;wireSpecific();}
+function render(){updateStatus();const html=({lock:lockPage,pin:pinPage,home:homePage,drawer:drawerPage,notifications:notificationsPage,kakao:kakaoPage,thread:threadPage,x:xPage,instagram:instagramPage,news:newsPage,article:articlePage,messages:messagesPage,mail:mailPage,maildetail:mailDetailPage,smsthread:smsThreadPage,gallery:galleryPage,viewer:viewerPage,phone:phonePage,notes:notesPage,music:musicPage,settings:settingsPage,browser:browserPage,calendar:calendarPage,bubble:bubblePage,recent:recentPage})[page]();screen.innerHTML=html;screen.scrollTop=0;wireSpecific();}
 const header=(title,sub='',actions='')=>`<div class="app-header"><button class="header-btn" data-back aria-label="뒤로">‹</button><div><h2>${title}</h2>${sub?`<p class="subheader">${sub}</p>`:''}</div><span class="header-spacer"></span>${actions}</div>`;
 function lockPage(){
  const clock=sceneTime().split(':');
@@ -155,13 +156,23 @@ function lockPage(){
 }
 
 function homePage(){
- const apps=[['kakao','카카오톡'],['messages','메시지'],['news','뉴스'],['mail','Gmail'],['x','X'],['instagram','Instagram'],['gallery','갤러리'],['browser','인터넷'],['notes','메모'],['calendar','캘린더'],['music','뮤직'],['settings','설정']];
- return `<div class="home"><div class="home-top">
+ const primary=['kakao','messages','mail','news','x','instagram','gallery','browser','calendar','notes','music','settings'];
+ const tools=['phone','kakao','messages','mail','news','calendar','notes','settings'];
+ return `<div class="home"><div class="home-carousel" id="home-carousel">
+ <section class="home-page page-primary"><div class="home-top">
  <button class="weather-widget" data-open="calendar"><span class="weather-moon">☾</span><div class="degree">13°</div><small>서울특별시<br>맑음 · 최저 11° / 최고 20°</small><small style="margin-top:5px">10.26 오전 ${sceneTime()}</small></button>
- <div class="mini-widgets"><button class="date-widget" data-open="calendar">10월 26일 월요일<b>공연 다음 날</b></button><button class="schedule-widget" data-open="news">방금 도착한 속보<b>열애설 기사 확산</b><span style="font-size:9px;opacity:.75">AFTER THE ENCORE</span></button></div></div>
- <button class="search-widget" data-open="browser"><span class="google-g">G</span><span style="flex:1;text-align:left;opacity:.62;font-size:12px">검색어 또는 URL 입력</span><span>⌕</span><span>♫</span></button>
- <div class="app-grid">${apps.map(a=>iconApp(...a)).join('')}</div>
- <div class="dock">${[['phone','전화'],['kakao','카카오톡'],['messages','메시지'],['browser','인터넷']].map(a=>iconApp(...a)).join('')}</div></div>`;
+ <div class="mini-widgets"><button class="date-widget" data-open="calendar">10월 26일 월요일<b>공연 다음 날</b></button><button class="schedule-widget" data-open="news">실시간 이슈<b>열애설 기사 확산</b><span style="font-size:9px;opacity:.72">AFTER THE ENCORE</span></button></div></div>
+ <button class="search-widget" data-open="browser"><span class="google-g">G</span><span style="flex:1;text-align:left;opacity:.60;font-size:12px">검색어 또는 URL 입력</span><span>⌕</span><span>♫</span></button>
+ <div class="home-apps">${primary.map(id=>iconApp(id,({kakao:'카카오톡',messages:'메시지',mail:'Gmail',news:'NAVER 뉴스',x:'X',instagram:'Instagram',gallery:'갤러리',browser:'인터넷',calendar:'캘린더',notes:'Samsung Notes',music:'YT Music',settings:'설정'})[id])).join('')}</div></section>
+ <section class="home-page page-tools"><h3>자주 쓰는 앱</h3><div class="home-apps">${tools.map(id=>iconApp(id,({phone:'전화',kakao:'카카오톡',messages:'메시지',mail:'Gmail',news:'뉴스',calendar:'캘린더',notes:'Samsung Notes',settings:'설정'})[id])).join('')}</div><button class="home-note-widget" data-open="notes"><small>Samsung Notes</small><b>막콘 끝나고</b><p>공연 잘 끝냈다.<br>아직도 귓가에 소리가 남아 있다.</p></button></section>
+ <section class="home-page page-music"><h3>어젯밤의 기록</h3><button class="home-note-widget" data-open="gallery"><img src="${PHOTO('stage.jpg')}" alt="공연장 사진"><small>갤러리</small><b>마지막 공연</b><p>2026.10.25 · 막콘을 끝낸 밤</p></button><div class="home-apps">${[['gallery','갤러리'],['music','YT Music'],['x','X'],['instagram','Instagram']].map(x=>iconApp(...x)).join('')}</div></section>
+ </div><div class="dots">${[0,1,2].map(i=>`<button type="button" data-home-page="${i}" aria-label="홈 화면 ${i+1}" class="${i===homeIndex?'active':''}">●</button>`).join('')}</div>
+ <div class="dock">${[['phone','전화'],['kakao','카카오톡'],['messages','메시지'],['browser','인터넷']].map(a=>iconApp(...a)).join('')}</div>
+ <button class="drawer-button" data-open="drawer" aria-label="모든 앱">⌃</button></div>`;
+}
+function drawerPage(){
+ const apps=[['kakao','카카오톡'],['messages','메시지'],['phone','전화'],['mail','Gmail'],['news','NAVER 뉴스'],['x','X'],['instagram','Instagram'],['gallery','갤러리'],['browser','인터넷'],['calendar','캘린더'],['notes','Samsung Notes'],['music','YT Music'],['settings','설정']];
+ return `<div class="app-page drawer-native"><div class="drawer-title">모든 앱</div><div class="home-apps">${apps.map(a=>iconApp(...a)).join('')}</div><button class="drawer-dismiss" data-open="home">홈 화면으로</button></div>`;
 }
 
 function pinPage(){
@@ -223,12 +234,13 @@ function recentPage(){return `<div class="app-page">${header('최근 앱')}<div 
 function flip(list,id){const s=new Set(list);s.has(id)?s.delete(id):s.add(id);return [...s]}
 function toast(msg){const prev=document.getElementById('toast');if(prev)prev.remove();const el=document.createElement('div');el.id='toast';el.textContent=msg;el.style.cssText='position:absolute;bottom:42px;left:15%;width:70%;background:#d6e4ce;color:#203027;padding:11px 10px;text-align:center;font-size:12px;border-radius:99px;z-index:25;box-shadow:0 5px 20px #0009';document.querySelector('.phone-surface').appendChild(el);setTimeout(()=>el.remove(),2200)}
 function modal(title,body,confirm){const layer=document.getElementById('modal-layer');layer.hidden=false;layer.innerHTML=`<div class="modal-card"><h3>${escaped(title)}</h3><p>${escaped(body)}</p><footer><button data-modal-cancel>취소</button><button class="danger" data-modal-confirm>확인</button></footer></div>`;layer.querySelector('[data-modal-cancel]').onclick=()=>{layer.hidden=true;layer.innerHTML=''};layer.querySelector('[data-modal-confirm]').onclick=()=>{layer.hidden=true;layer.innerHTML='';confirm()}}
-function wireSpecific(){if(page==='thread'){const box=document.querySelector('.thread-scroll');if(box)box.scrollTop=box.scrollHeight}}
+function wireSpecific(){if(page==='home'){const slider=screen.querySelector('#home-carousel');if(slider){requestAnimationFrame(()=>{slider.scrollLeft=homeIndex*slider.clientWidth});slider.addEventListener('scroll',()=>{const i=Math.round(slider.scrollLeft/Math.max(1,slider.clientWidth));homeIndex=Math.max(0,Math.min(2,i));screen.querySelectorAll('.dots [data-home-page]').forEach((b,n)=>b.classList.toggle('active',n===homeIndex))},{passive:true})}}if(page==='thread'){const box=document.querySelector('.thread-scroll');if(box)box.scrollTop=box.scrollHeight}}
 function handleClick(e){const el=e.target.closest('button,a');if(!el||el.tagName==='A')return;
  const ds=el.dataset;
  if('unlock' in ds){pinBuffer='';nav('pin');return}
  if('pinKey' in ds){if(ds.pinKey==='⌫')pinBuffer=pinBuffer.slice(0,-1);else if(pinBuffer.length<4)pinBuffer+=ds.pinKey;if(pinBuffer.length===4){if(pinBuffer==='0613'){state.unlocked=true;save();pinBuffer='';nav('home',{},true);return}pinBuffer='';render();const msg=document.getElementById('pin-message');if(msg)msg.textContent='PIN이 올바르지 않습니다.';return}render();return}
  if('back' in ds){back();return}
+ if('homePage' in ds){homeIndex=Number(ds.homePage)||0;const slider=screen.querySelector('#home-carousel');slider?.scrollTo({left:homeIndex*slider.clientWidth,behavior:'smooth'});screen.querySelectorAll('.dots [data-home-page]').forEach((b,n)=>b.classList.toggle('active',n===homeIndex));return}
  if('open' in ds){if(ds.open==='news'&&state.minute<2)forward(2);if(ds.open==='x'&&state.minute<4)forward(4);nav(ds.open);return}
  if('article' in ds){nav('article',{id:ds.article});return}
  if('sms' in ds){nav('smsthread',{id:ds.sms});return}
