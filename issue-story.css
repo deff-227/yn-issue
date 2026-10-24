@@ -48,3 +48,19 @@
 .issue-alert-scroll>button:focus-visible{outline:2px solid #1d6147;outline-offset:2px}
 .issue-sms-row .chat-details{overflow:hidden}
 .issue-sms-row .chat-details p{max-width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* The original 2026 Galaxy lock screen renders no native notice card.
+   Insert the incoming SMS as a floating card without changing its clock layout. */
+#surface .lock-screen.lock-v3 .issue-lock-preview,
+#surface .lock-screen .issue-lock-preview{
+ position:absolute!important;top:63%;left:16px;right:16px;width:calc(100% - 32px);
+ margin:0!important;z-index:7;display:block;text-align:left;
+ background:rgba(245,249,242,.9);color:#263d31;border:1px solid #ffffffa8;
+ padding:13px 15px;border-radius:21px;backdrop-filter:blur(18px);
+ box-shadow:0 9px 26px #183b2e30;pointer-events:auto;min-height:88px;
+}
+#surface .issue-lock-preview .notice-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+#surface .issue-lock-preview .notice-name{font-weight:700;font-size:12px}
+#surface .issue-lock-preview .notice-message{font-size:12px;line-height:1.55;margin-top:5px}
+#surface .lock-v3 .issue-lock-preview .kakao-mini{background:#e0eefa!important;color:#35546c!important}
+@media(max-height:730px){#surface .lock-screen.lock-v3 .issue-lock-preview{top:60%}}
