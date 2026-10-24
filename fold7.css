@@ -48,3 +48,25 @@ body{background:#24342f;color:#e5eee5}
 #modal-layer[hidden]{display:none!important}
 @media(max-width:1000px){.scene{padding:20px 14px 42px;min-height:100dvh}.intro,.right-note{display:none}.device-wrap{width:100%}.device{height:min(805px,calc(100dvh - 82px))}.under-device{margin-top:12px}}
 @media(max-width:550px){body{background:#24342f}.scene{padding:0;display:block;min-height:100dvh}.device-wrap{width:100%;display:block}.device{width:100%;max-width:100%;height:100dvh;min-height:540px;padding:0;border:0;border-radius:0;box-shadow:none}.fold-screen{border-radius:0}.device.folded-open{width:100%;height:100dvh}.under-device{display:none}.sim-screen{inset:33px 0 42px}.home{padding-bottom:12px}}
+
+/* Original Samsung/Kakao conversation palette */
+.sim-screen:has(.chat-row)>.app-page{background:#fff;color:#171717}
+.sim-screen:has(.chat-row) .app-header{background:#fff;color:#111;border:0}
+.sim-screen:has(.chat-row) .tabs{background:#fff;color:#222;border-bottom:1px solid #f0f0f0}
+.sim-screen:has(.chat-row) .tabs button{color:#777}
+.sim-screen:has(.chat-row) .tabs button.active{color:#151515}
+.sim-screen:has(.chat-row) .tabs button.active:after{background:#202020}
+.sim-screen:has(.chat-row) .chat-row{background:#fff;color:#202020;border-bottom:1px solid #f4f4f4;padding:13px 17px}
+.sim-screen:has(.chat-row) .chat-row:hover{background:#f5f5f5}
+.sim-screen:has(.chat-row) .chat-summary p{color:#878787}
+.sim-screen:has(.chat-row) .chat-meta{color:#979797}
+.sim-screen:has(.chat-row)+.system-nav{color:#151515}
+.sim-screen:has(.thread) .thread{background:#b9cbd9;color:#202c35}
+.sim-screen:has(.thread) .thread .app-header{background:#b9cbd9;color:#203642}
+.sim-screen:has(.thread) .day-divider,.sim-screen:has(.thread) .bubble-time{color:#587080}
+.sim-screen:has(.thread) .bubble-author{color:#354f60}
+.sim-screen:has(.thread) .compose{background:#c3d3df}
+.sim-screen:has(.thread) .bubble-avatar{background:#e7f0f3;color:#516675}
+.sim-screen:has(.thread)+.system-nav{color:#233843}
+.sim-screen:has(.news-native)+.system-nav,.sim-screen:has(.sms-app)+.system-nav,.sim-screen:has(.mail-app)+.system-nav{color:#28343b}
+@media(max-width:550px){.device .home .app-grid{gap:14px 10px;margin-top:21px}.sim-screen:has(.home){overflow:hidden}.home .app-grid{overflow-y:auto}}
