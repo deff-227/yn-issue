@@ -220,7 +220,41 @@ ARTICLES.forEach(a=>{const times={kiss:"00:06",hands:"00:19",ring:"00:14",follow
  function showArticle(id){const a=ARTICLES.find(a=>a.id===id)||ARTICLES[0];shell("기사 상세",`<article class="issue-detail"><small>${escaped(a.source)} · ${escaped(a.time)}</small><h2>${escaped(a.title)}</h2><p>${escaped(a.summary)}</p><div class="issue-proof"><b>첨부 사진 01</b><b>첨부 사진 02</b><b>첨부 사진 03</b></div>${a.paragraphs.map(t=>`<p>${escaped(t)}</p>`).join("")}<button data-issue="app" data-id="after-x">X 반응 보기 ↗</button></article>`)}
  function showSMS(id){const t=SMS_THREADS.find(t=>t.id===id);if(!t)return;screen="sms-thread";setSurface(`<section class="app-view sms-thread"><header class="app-header"><button data-issue="smsback">‹</button><h2>${escaped(t.sender)}</h2></header><div class="chat-scroll">${t.body.map(x=>`<div class="message"><div class="msg-body"><div class="bubble-line"><div class="bubble">${escaped(x[1])}</div><small>${escaped(x[0])}</small></div></div></div>`).join("")}${id==="sms"?"<div class='issue-proof'><b>사진 01</b><b>사진 02</b><b>사진 03</b></div>":""}</div></section>`,{light:true})}
  function showMail(id){const m=MAILS.find(x=>x.id===id);if(m)shell("Gmail",`<div class="issue-detail"><h2>${escaped(m.title)}</h2><small>${escaped(m.from)} · ${escaped(m.address)}</small><p>${escaped(m.body)}</p><button data-issue="mailback">받은편지함으로</button></div>`)}
- document.getElementById("surface").addEventListener("click",e=>{
+ 
+renderSMS=function(){
+ const list=SMS_THREADS.filter(t=>t.at<=flow.minute).slice().reverse();
+ shell("메시지",`<div class="sms-hero">메시지 <span>${list.length}개의 대화</span></div>${list.map(t=>{
+   const latest=t.body.filter(m=>Number(m[0].slice(-2))<=flow.minute).at(-1);
+   return `<button class="chat-list-row issue-sms-row" data-issue="sms" data-id="${t.id}"><span class="profile">${escaped(t.sender.slice(0,2))}</span><span class="chat-details"><b>${escaped(t.sender)}</b><p>${escaped(latest?.[1]||"")}</p></span><small>00:${String(t.at).padStart(2,"0")}</small></button>`;
+ }).join("")}`);
+};
+showSMS=function(id){
+ const t=SMS_THREADS.find(t=>t.id===id);if(!t)return;
+ screen="sms-thread";
+ const rows=t.body.filter(x=>Number(x[0].slice(-2))<=flow.minute);
+ setSurface(`<section class="app-view sms-thread"><header class="app-header"><button data-issue="smsback" class="icon-btn" aria-label="목록으로">‹</button><h2>${escaped(t.sender)}</h2></header><div class="chat-scroll"><div class="chat-date">10월 26일 월요일</div>${rows.map(x=>`<div class="message"><div class="msg-body"><div class="bubble-line"><div class="bubble">${escaped(x[1])}</div><small>${escaped(x[0])}</small></div></div></div>`).join("")}${id==="sms"&&flow.minute>=0?`<div class="issue-proof">${[1,2,3].map(i=>`<button data-issue="proof" data-id="${i}">사진 ${String(i).padStart(2,"0")}</button>`).join("")}</div>`:""}</div><div class="issue-sms-footer">알 수 없는 발신자에게는 답장하지 않았습니다.</div></section>`);
+};
+const goIssueNotice=function goIssueNotice(n){
+ flow.cleared=[...new Set([...flow.cleared,n.id])];save();overlay.innerHTML="";
+ if(mapping[n.target])return openChat(mapping[n.target]);
+ if(n.target==="mail")return openApp("mail");
+ if(n.target.startsWith("sms")){openApp("messages");return showSMS(n.target)}
+ if(n.target.startsWith("article:")){openApp("after-news");return showArticle(n.target.split(":")[1])}
+ if(n.target==="article"){openApp("after-news");return showArticle("kiss")}
+ if(n.target==="x")return openApp("after-x");
+ return openApp("after-news");
+};
+const flashIncoming=function flashIncoming(newArr){
+ if(!unlocked||flow.muted||!newArr.length)return;
+ const root=document.getElementById("screen");if(!root)return;
+ root.querySelectorAll(".issue-push-banner").forEach(x=>x.remove());
+ const n=newArr.at(-1),btn=document.createElement("button");
+ btn.type="button";btn.className="issue-push-banner";
+ btn.innerHTML=`<small>${escaped(n.from)} · 방금</small><b>${escaped(n.title)}</b><span>${escaped(n.message)}</span>${newArr.length>1?`<small>외 ${newArr.length-1}개 알림</small>`:""}`;
+ btn.onclick=()=>{btn.remove();goIssueNotice(n)};
+ root.appendChild(btn);setTimeout(()=>btn.remove(),4300);
+};
+document.getElementById("surface").addEventListener("click",e=>{
   const b=e.target.closest("[data-issue]");if(!b)return;
   const t=b.dataset.issue,id=b.dataset.id;
   if(t==="mute"){flow.muted=!flow.muted;save();openQuick()}
@@ -228,6 +262,7 @@ ARTICLES.forEach(a=>{const times={kiss:"00:06",hands:"00:19",ring:"00:14",follow
   else if(t==="app")openApp(id);
   else if(t==="article")showArticle(id);
   else if(t==="sms")showSMS(id);
+  else if(t==="proof")showInfo("첨부된 사진", "주차장에서 촬영된 것으로 주장하는 사진 3장이 전송됐습니다. 현재 미리보기만 표시됩니다.");
   else if(t==="mail")showMail(id);
   else if(t==="smsback")renderSMS();
   else if(t==="mailback")renderMail();
@@ -237,11 +272,11 @@ ARTICLES.forEach(a=>{const times={kiss:"00:06",hands:"00:19",ring:"00:14",follow
   const b=e.target.closest("[data-issue]");if(!b)return;
   const t=b.dataset.issue;if(t==="mute"){flow.muted=!flow.muted;save();openQuick()}
   if(t==="clear"){flow.cleared=[...new Set([...flow.cleared,...ALERTS.filter(a=>a.at<=flow.minute).map(a=>a.id)])];save();openQuick()}
-  if(t==="notice"){const n=ALERTS.find(a=>a.id===b.dataset.id);if(!n)return;flow.cleared.push(n.id);save();overlay.innerHTML="";if(mapping[n.target])openChat(mapping[n.target]);else if(n.target==="mail")openApp("mail");else if(n.target.startsWith("sms"))openApp("messages");else openApp("after-news")}
+  if(t==="notice"){const n=ALERTS.find(a=>a.id===b.dataset.id);if(n)goIssueNotice(n)}
  });
  injectMessages();lockPhone();
  const initialStatus=document.querySelector("#statusbar>span:first-child");
  if(initialStatus)initialStatus.innerHTML=clock()+" <span class='tiny-notice'>▣</span>";
- setInterval(()=>{if(flow.minute<38){flow.minute++;save();injectMessages();if(screen==="lock")renderLock();else if(screen==="kakao"&&!activeChat)renderKakao();else if(screen==="kakao"&&activeChat)renderChat()}const status=document.querySelector("#statusbar>span:first-child");if(status)status.innerHTML=clock()+" <span class='tiny-notice'>"+(shown().length?"▣":"")+"</span>"},6500);
+ setInterval(()=>{if(flow.minute<38){flow.minute++;save();injectMessages();const newArr=ALERTS.filter(n=>n.at===flow.minute);if(screen==="lock")renderLock();else if(screen==="kakao"&&!activeChat)renderKakao();else if(screen==="kakao"&&activeChat)renderChat();else if(screen==="messages")renderSMS();else if(screen==="mail")renderMail();flashIncoming(newArr)}const status=document.querySelector("#statusbar>span:first-child");if(status)status.innerHTML=clock()+" <span class='tiny-notice'>"+(shown().length?"▣":"")+"</span>"},6500);
 })();
 })();
