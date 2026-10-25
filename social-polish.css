@@ -1,0 +1,19 @@
+/* X and Instagram layout refinements */
+.x-page .tweet-actions button{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:#879097;padding:4px 3px}
+.x-page .tweet-actions svg{width:15px;height:15px}
+.x-page .reacted-like,.ig-page .reacted-like{color:#e83f65!important}
+.x-page .reacted-repost{color:#0da782!important}
+.x-page .reacted-save,.ig-page .reacted-save{color:#386ed2!important}
+.x-page .tweet-body>p{white-space:pre-wrap;line-height:1.7;font-size:11px;word-break:keep-all}
+.ig-page .ig-media{height:auto;aspect-ratio:1/1;min-height:240px;overflow:hidden}
+.ig-page .ig-media img{width:100%;height:100%;object-fit:cover}
+.ig-page .ig-media-content{display:flex;flex-direction:column;gap:8px;border:1px solid #ffffff55;padding:16px;border-radius:15px;background:#172c3380;color:white}
+.ig-page .ig-media-content b{font-size:17px}
+.ig-page .ig-media-content span{font-size:10px;color:#d7e1e2}
+.ig-page .ig-actionbar{display:flex;justify-content:space-between;align-items:center;margin:0 0 8px}
+.ig-page .ig-actionbar>div{display:flex;gap:11px}
+.ig-page .ig-actionbar button{padding:0;display:inline-grid;place-items:center;color:#111}
+.ig-page .ig-actionbar svg{width:23px;height:23px}
+.ig-page .ig-body p{white-space:pre-wrap}
+.ig-page .ig-story-avatar{display:grid;place-items:center;width:49px;height:49px;border:2px solid #c95689;border-radius:50%;margin:0 auto 4px;background:#f4e8ef;color:#97577a}
+.social-page .social-empty{text-align:center;padding:32px;color:#9ba3a8;font-size:11px}
